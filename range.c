@@ -523,7 +523,10 @@ range_each(VALUE range)
  *  call-seq:
  *     rng.begin    -> obj
  *
- *  Returns the first object in <i>rng</i>.
+ *  Returns the first object in the range.
+ *
+ *     (1..10).begin      #=> 1
+ *     ('a'..'z').begin   #=> "a"
  */
 
 static VALUE
@@ -537,7 +540,7 @@ range_begin(VALUE range)
  *  call-seq:
  *     rng.end    -> obj
  *
- *  Returns the object that defines the end of <i>rng</i>.
+ *  Returns the last object in the range.
  *
  *     (1..10).end    #=> 10
  *     (1...10).end   #=> 10
@@ -570,7 +573,10 @@ first_i(VALUE i, VALUE *ary)
  *     rng.first    -> obj
  *     rng.first(n) -> an_array
  *
- *  Returns the first object in <i>rng</i>, or the first +n+ elements.
+ *  Returns the first object in the range, or the first +n+ elements.
+ *
+ *     (1..10).first     #=> 1
+ *     (1..10).first(3)  #=> [1, 2, 3]
  */
 
 static VALUE
@@ -594,7 +600,10 @@ range_first(int argc, VALUE *argv, VALUE range)
  *     rng.last    -> obj
  *     rng.last(n) -> an_array
  *
- *  Returns the last object in <i>rng</i>, or the last +n+ elements.
+ *  Returns the last object in the range, or the last +n+ elements.
+ *
+ *     (1..10).last    #=> 10
+ *     (1..10).last(4) #=> [7, 8, 9, 10]
  */
 
 static VALUE
@@ -607,13 +616,15 @@ range_last(int argc, VALUE *argv, VALUE range)
 
 /*
  *  call-seq:
- *     rng.min                    -> obj
- *     rng.min {| a,b | block }   -> obj
+ *     rng.min                  -> obj
+ *     rng.min {|a,b| block }   -> obj
  *
- *  Returns the minimum value in <i>rng</i>. The second uses
+ *  Returns the minimum value in the range. The second uses
  *  the block to compare values.  Returns nil if the first
  *  value in range is larger than the last value.
  *
+ *     (-3..2).min                           #=> -3
+ *     (-3..2).min {|a,b| a.abs <=> b.abs }  #=> 0
  */
 
 
@@ -637,12 +648,14 @@ range_min(VALUE range)
 /*
  *  call-seq:
  *     rng.max                    -> obj
- *     rng.max {| a,b | block }   -> obj
+ *     rng.max {|a,b| block }     -> obj
  *
- *  Returns the maximum value in <i>rng</i>. The second uses
+ *  Returns the maximum value in the range. The second uses
  *  the block to compare values.  Returns nil if the first
  *  value in range is larger than the last value.
  *
+ *     (2..5).max                           #=> 5
+ *     (2..5).max {|a,b| a * a <=> b * b }  #=> 5
  */
 
 static VALUE
