@@ -23,6 +23,7 @@ static ID id_cmp, id_succ, id_beg, id_end, id_excl;
 #define EXCL(r) RTEST(RANGE_EXCL(r))
 #define SET_EXCL(r,v) (RSTRUCT(r)->as.ary[2] = (v) ? Qtrue : Qfalse)
 
+
 static VALUE
 range_failed(void)
 {
@@ -970,56 +971,81 @@ range_alloc(VALUE klass)
     return rb_struct_alloc_noinit(klass);
 }
 
-/*  A <code>Range</code> represents an interval---a set of values with a
- *  start and an end. Ranges may be constructed using the
- *  <em>s</em><code>..</code><em>e</em> and
- *  <em>s</em><code>...</code><em>e</em> literals, or with
- *  <code>Range::new</code>. Ranges constructed using <code>..</code>
- *  run from the start to the end inclusively. Those created using
- *  <code>...</code> exclude the end value. When used as an iterator,
- *  ranges return each value in the sequence.
+/* Document-class: Range
  *
+ *  A Range represents an interval, a set of values with a start and
+ *  an end. Ranges may be constructed using the
+ *  <code>starting..ending</code> and <code>starting...ending</code>
+ *  literals, or with <code>Range::new(low, high)</code>. Ranges
+ *  constructed using <code>..</code> run from the start to the end
+ *  inclusively; those created using <code>...</code> exclude the end
+ *  value. When used as an iterator, ranges return each value in the
+ *  sequence.
+ *
+ *     (1..5).to_a     #=> [1, 2, 3, 4, 5]
+ *     (1...5).to_a    #=> [1, 2, 3, 4]
+ *     (1..1).to_a     #=> [1]
+ *     (1...1).to_a    #=> []
+ *     ('a'..'e').to_a #=> ["a", "b", "c", "d", "e"]
+ *     ('a'...'e').to_a #=> ["a", "b", "c", "d"]
+ *
+ *  If the ending value is less than the starting value, the Range
+ *  will be empty.
+ *
+ *     (5..1).to_a        #=> []
  *     (-1..-5).to_a      #=> []
  *     (-5..-1).to_a      #=> [-5, -4, -3, -2, -1]
- *     ('a'..'e').to_a    #=> ["a", "b", "c", "d", "e"]
- *     ('a'...'e').to_a   #=> ["a", "b", "c", "d"]
  *
- *  Ranges can be constructed using objects of any type, as long as the
- *  objects can be compared using their <code><=></code> operator and
- *  they support the <code>succ</code> method to return the next object
- *  in sequence.
+ *  Ranges can be constructed using objects of any type that supports
+ *  the <code><=></code> operator to compare values, and the
+ *  <code>succ</code> method to return the next object in sequence.
+ *
+ *  For example, here's a class that represents strings of x's. Since
+ *  it supports <code><=></code> and <code>succ</code>, you can use it
+ *  to make Ranges.
  *
  *     class Xs                # represent a string of 'x's
  *       include Comparable
  *       attr :length
+
  *       def initialize(n)
  *         @length = n
  *       end
+
  *       def succ
  *         Xs.new(@length + 1)
  *       end
+
  *       def <=>(other)
  *         @length <=> other.length
  *       end
+
  *       def to_s
  *         sprintf "%2d #{inspect}", @length
  *       end
+
  *       def inspect
  *         'x' * @length
  *       end
+
  *     end
  *
  *     r = Xs.new(3)..Xs.new(6)   #=> xxx..xxxxxx
  *     r.to_a                     #=> [xxx, xxxx, xxxxx, xxxxxx]
  *     r.member?(Xs.new(5))       #=> true
  *
- *  In the previous code example, class <code>Xs</code> includes the
- *  <code>Comparable</code> module. This is because
- *  <code>Enumerable#member?</code> checks for equality using
- *  <code>==</code>. Including <code>Comparable</code> ensures that the
- *  <code>==</code> method is defined in terms of the <code><=></code>
- *  method implemented in <code>Xs</code>.
+ *  (<code>Xs</code> includes the Comparable module, because it
+ *  defines the <code>==</code> method in terms of the
+ *  <code><=></code> method. This means that the Enumerable module's
+ *  <code>member?</code> method, which uses <code>==</code>, will work
+ *  correctly.)
  *
+ *  Note that you can't make a Range out of all the types you might
+ *  expect to.  3.5 .. 11.17 makes sense logically, but Floats can't
+ *  be fully used to make Ranges, because they can't be discretely
+ *  enumerated.
+ *
+ *     (3.5)..(11.17).to_a  #=> TypeError: can't iterate from Float
  */
 
 void
