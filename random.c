@@ -452,21 +452,20 @@ rand_init(struct MT *mt, VALUE vseed)
 /*
 * Document-class: Random
 *
-* Random provides an interface to Ruby's pseudorandom number generator (PRNG).
+* Random provides an interface to Ruby's pseudorandom number generator, or PRNG.
 * The PRNG produces a deterministic sequence of bits which approximate true
 * randomness. The sequence may be represented by integers, floats, or binary
 * strings.
 *
 * The generator may be initialized with either a system-generated or user-supplied
-* seed value.
+* seed value by using Random.srand.
 *
-* Basic usage:
+* The class method Random.rand provides the base functionality of Kernel.rand
+* along with better handling of floating point values. These are both interfaces to
+* Random::DEFAULT, the Ruby system PRNG. 
 *
-*   Random.rand       # a Float which is >= 0 and < 1
-*   Random.rand(100)  # a Fixnum in the range 0..99
-*
-* Note that there is another interface through Kernel.rand which behaves somewhat
-* differently.
+* Random.new will create a new PRNG with a state independent of Random::DEFAULT.
+* This object can be marshalled, allowing a sequence to be saved and resumed.
 *
 * The PRNG is currently implemented as a modified Mersenne Twister with a period
 * of 2**19937-1.
@@ -607,7 +606,7 @@ random_seed(void)
  *    prng1.seed       #=> 1234
  *    prng1.rand(100)  #=> 47
  *
- *    prng2 = Random.new(r1.seed)
+ *    prng2 = Random.new(prng1.seed)
  *    prng2.rand(100)  #=> 47
  */
 static VALUE
@@ -1269,7 +1268,7 @@ random_equal(VALUE self, VALUE other)
  *
  *    rand(100)   #=> 12
  *
- * Due to the way _max_ is handled, negative or floating point arguments may give
+ * Negative or floating point values for _max_ are allowed, but may give
  * surprising results.
  *
  *    rand(-100)  #=> 87
@@ -1278,8 +1277,8 @@ random_equal(VALUE self, VALUE other)
  *
  * Kernel.srand may be used to ensure that sequences of random numbers are
  * reproducable between different runs of a program.
- * See also Random.rand, which disallows negative values for _max_, allows
- * both integer and floating point +Range+\s, and correctly handles +Float+\s.
+ *
+ * See also Random.rand.
  */
 
 static VALUE
@@ -1307,7 +1306,7 @@ rb_f_rand(int argc, VALUE *argv, VALUE obj)
  *    Random.rand -> float
  *    Random.rand(max) -> number
  *
- * Alias of _Random.rand_.
+ * Alias of Random::DEFAULT.rand.
  */
 
 static VALUE
