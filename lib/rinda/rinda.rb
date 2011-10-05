@@ -2,19 +2,102 @@ require 'drb/drb'
 require 'thread'
 
 ##
-# A module to implement the Linda distributed computing paradigm in Ruby.
+# == Overview
 #
-# Rinda is part of DRb (dRuby).
 #
-# == Example(s)
+# Rinda is a ruby implementation of the Linda distributed computing paradigm.
 #
-# See the sample/drb/ directory in the Ruby distribution, from 1.8.2 onwards.
+# Linda is a model of coordination and communication among several parallel
+# processes operating upon objects stored in and
+# retrieved from shared, virtual, associative memory.
 #
-#--
-# TODO
-# == Introduction to Linda/rinda?
+# In Rinda, distributed objects are stored in a TupleSpace in the form
+# of Tuples, ie:
 #
-# == Why is this library separate from DRb?
+#  ['people', 'developers', John']
+#  ['people', 'developers', Marcus']
+#
+# A TupleSpace is an implementation of the associative memory paradigm
+# for parallel/distributed computing. It provides a repository of Tuples
+# that can be accessed concurrently.
+#
+# As an illustrative example, consider that there are a group of
+# processors that produce pieces of data and a group of processors
+# that use the data. Producers post their data as Tuples in the
+# TupleSpace, and consumers then retrieve data from the TupleSpace
+# that match a certain pattern. This is also known as the blackboard metaphor.
+#
+# Rinda is built on the top of DRb.
+#
+# == Code examples
+#
+# Here is an example on how to build a distributed system using Rinda.
+#
+# The system is composed of three ruby applications
+#
+# * client.rb
+# * server.rb
+# * tuple_space.rb
+#
+# === tuple_space.rb
+#
+# It serves the TupleSpace that is going to be used by the two others.
+#
+#   require 'drb/drb'
+#   require 'rinda/tuplespace'
+#
+#   uri = druby://localhost:8787
+#
+#   DRb.start_service(uri, Rinda::TupleSpace.new)
+#   puts DRb.uri
+#   DRb.thread.join
+#
+# === client.rb
+#
+# It produces 10 tuples. Those tuples are manipulated in server.rb
+# Then it takes from TupleSpace 10 tuples and show the results.
+#
+#   require 'drb/drb'
+#   require 'rinda/rinda'
+#
+#   uri = druby://localhost:8787
+#
+#   DRb.start_service
+#   tuple_space = Rinda::TupleSpaceProxy.new(DRbObject.new(nil, uri))
+#
+#   (1..10).each do |number|
+#     tuple_space.write(['sum', DRb.uri, number])
+#   end
+#
+#   (1..10).each do |number|
+#     ans = tuple_space.take(['ans', DRb.uri, number, nil])
+#     p [ans[2], ans[3]]
+#   end
+#
+# === server.rb
+#
+# It consumes all tuples in the form ['sum', *, *]
+# and for each one that it consumes it produces a tuple
+# with the result of the manipulation.
+#
+#   require 'drb/drb'
+#   require 'rinda/rinda'
+#
+#   def do_it(value)
+#     puts "do_it(#{value})"
+#     value + value
+#   end
+#
+#   uri = druby://localhost:8787
+#
+#   DRb.start_service
+#   tuple_space = Rinda::TupleSpaceProxy.new(DRbObject.new(nil, uri))
+#
+#   while true
+#     r = tuple_space.take(['sum', nil, nil])
+#     v = do_it(r[2])
+#     tuple_space.write(['ans', r[1], r[2], v])
+#   end
 
 module Rinda
 
@@ -83,14 +166,15 @@ module Rinda
 
     def each # FIXME
       if Hash === @tuple
-        @tuple.each { |k, v| yield(k, v) }
+        @tuple.each { |key, value| yield(key, value) }
       else
-        @tuple.each_with_index { |v, k| yield(k, v) }
+        @tuple.each_with_index { |value, key| yield(key, value) }
       end
     end
 
     ##
     # Return the tuple itself
+
     def value
       @tuple
     end
@@ -126,24 +210,28 @@ module Rinda
 
   ##
   # Templates are used to match tuples in Rinda.
+  #
+  # The +tuple+ must be the same size as the template.
+  # An element with a +nil+ value in a template acts
+  # as a wildcard, matching any value in the corresponding position in the
+  # tuple.
+  #
+  # Elements of the template match the +tuple+ if the are == or ===
+  #
+  #   Template.new([:foo, 5]).match   Tuple.new([:foo, 5]) # => true
+  #   Template.new([:foo, nil]).match Tuple.new([:foo, 5]) # => true
+  #   Template.new([String]).match    Tuple.new(['hello']) # => true
+  #
+  #   Template.new([:foo]).match      Tuple.new([:foo, 5]) # => false
+  #   Template.new([:foo, 6]).match   Tuple.new([:foo, 5]) # => false
+  #   Template.new([:foo, nil]).match Tuple.new([:foo])    # => false
+  #   Template.new([:foo, 6]).match   Tuple.new([:foo])    # => false
+
 
   class Template < Tuple
 
     ##
-    # Matches this template against +tuple+.  The +tuple+ must be the same
-    # size as the template.  An element with a +nil+ value in a template acts
-    # as a wildcard, matching any value in the corresponding position in the
-    # tuple.  Elements of the template match the +tuple+ if the are #== or
-    # #===.
-    #
-    #   Template.new([:foo, 5]).match   Tuple.new([:foo, 5]) # => true
-    #   Template.new([:foo, nil]).match Tuple.new([:foo, 5]) # => true
-    #   Template.new([String]).match    Tuple.new(['hello']) # => true
-    #
-    #   Template.new([:foo]).match      Tuple.new([:foo, 5]) # => false
-    #   Template.new([:foo, 6]).match   Tuple.new([:foo, 5]) # => false
-    #   Template.new([:foo, nil]).match Tuple.new([:foo])    # => false
-    #   Template.new([:foo, 6]).match   Tuple.new([:foo])    # => false
+    # Matches this template against +tuple+.
 
     def match(tuple)
       return false unless tuple.respond_to?(:size)
@@ -173,12 +261,27 @@ module Rinda
   end
 
   ##
-  # <i>Documentation?</i>
+  # A DRb::DRbObject evaluates === as a match for both +uri+ and +ref+.
+  #
+  # Rinda::DRbObjectTemplate allows for a more specific comparison. You can
+  # compare either by +uri+ or by +ref+ or considering both.
+  #
+  #   a = DRbObject.new(nil, "druby://host:1234")
+  #   b = Rinda::DRbObjectTemplate.new
+  #   a === b => True
+  #
+  #   a = DRbObject.new(nil, "druby://host:1234")
+  #   b = Rinda::DRbObjectTemplate.new("druby://host:1234")
+  #   a === b => True
+  #
+  #   a = DRbObject.new_with("druby://foo:12345", 1234)
+  #   b = Rinda::DRbObjectTemplate.new(/^druby:\/\/(foo|bar):/)
+  #   a === b => True
 
   class DRbObjectTemplate
 
     ##
-    # Creates a new DRbObjectTemplate that will match against +uri+ and +ref+.
+    # Creates a new DRbObjectTemplate that will match against +uri+ and/or +ref+.
 
     def initialize(uri=nil, ref=nil)
       @drb_uri = uri
