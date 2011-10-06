@@ -983,12 +983,14 @@ range_alloc(VALUE klass)
 
 /* Document-class: Range
  *
- *  A Range represents an interval, a set of values from #begin to
- *  #end. Ranges may be constructed using the +low..high+ and
- *  +low...high+ literals, or with Range::new(low, high). Ranges
- *  created with +..+ include the high value; those created with +...+
- *  exclude it. When used as an iterator, ranges return each value in
- *  the sequence.
+ * A Range represents an interval, a set of values from #begin to
+ * #end.
+ *
+ * Ranges are constructed with the +low..high+ and +low...high+
+ * literal syntax, or with Range::new(low, high). Ranges created with
+ * +..+ include the high value; those created with +...+ exclude it.
+ *
+ * When used as an iterator, ranges return each value in the sequence.
  *
  *     (1..5).to_a     #=> [1, 2, 3, 4, 5]
  *     (1...5).to_a    #=> [1, 2, 3, 4]
@@ -997,22 +999,39 @@ range_alloc(VALUE klass)
  *     ('a'..'e').to_a #=> ["a", "b", "c", "d", "e"]
  *     ('a'...'e').to_a #=> ["a", "b", "c", "d"]
  *
- *  If the first value is greater than the second value, the Range
- *  will be empty.
+ * If the first value is greater than the second value, the Range will
+ * be empty. There are no numbers greater than 5, and less than 1:
  *
  *     (5..1).to_a        #=> []
  *     (-1..-5).to_a      #=> []
  *     (-5..-1).to_a      #=> [-5, -4, -3, -2, -1]
  *
- *  A Range can be constructed using objects of any type that supports
- *  the <code><=></code> operator to compare values, and the +succ+
- *  method to return the next object in sequence.
+ * == Working with Ranges
  *
- *  For example, here's a class that represents strings of x's. Since
- *  it supports <code><=></code> and +succ+, you can use it to make a
- *  Range.
+ * Ranges are often used for extracting part of a String or Array.
  *
- *     class Xs                # represent a string of 'x's
+ *    "develop"[1..3]         #=> "eve"
+ *    [20, 30, 40, 50][1..3]  #=> [30, 40, 50]
+ *
+ * == Ranges From Other Types
+ *
+ * A Range can be constructed from objects other than integers and
+ * strings (though in practice, this isn't common). The objects' class
+ * only needs to support the <code><=></code> operator to compare
+ * instances, and the +succ+ method to return the next instance in
+ * sequence.
+ *
+ * This means that you can't make a Range from Float objects, since
+ * Float doesn't support +succ+ - Floats can't be discretely iterated.
+ *
+ *    (3.5)..(11.17).to_a  #=> TypeError: can't iterate from Float
+ *
+ * === An Example of a Custom Class in a Range
+ *
+ * This class represents strings of x's. Since it implements +succ+
+ * and <code><=></code>, you can make Ranges with it.
+ *
+ *     class Xs
  *       include Comparable
  *       attr :length
 
@@ -1042,16 +1061,10 @@ range_alloc(VALUE klass)
  *     r.to_a                     #=> [xxx, xxxx, xxxxx, xxxxxx]
  *     r.member?(Xs.new(5))       #=> true
  *
- *  (+Xs+ includes the Comparable module, which defines the
- *  <code>==</code> method in terms of the <code><=></code>
- *  method. This means that the Enumerable module's +member?+ method,
- *  which uses <code>==</code>, will work correctly.)
- *
- *  Note that you can't make a Range out of all the types you might
- *  expect to.  (3.5 .. 11.17) makes sense logically, but Floats can't
- *  be discretely enumerated, so they cause errors in Ranges:
- *
- *     (3.5)..(11.17).to_a  #=> TypeError: can't iterate from Float
+ * (+Xs+ includes the Comparable module, which defines the
+ * <code>==</code> method in terms of the <code><=></code>
+ * method. This means that the Enumerable module's +member?+ method,
+ * which uses <code>==</code>, will work correctly.)
  */
 
 void
