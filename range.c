@@ -72,8 +72,8 @@ rb_range_new(VALUE beg, VALUE end, int exclude_end)
  *     Range.new(beginning, ending, exclusive=false)    -> range
  *
  *  Constructs a range using the given +beginning+ and +ending+
- *  values. The range will exclude the +ending+ value if +exclusive+
- *  is true. It defaults to false.
+ *  values. The range will include the +ending+ value if +exclusive+
+ *  is false, which is the default behavior.
  */
 
 static VALUE
@@ -122,7 +122,7 @@ recursive_equal(VALUE range, VALUE obj, int recur)
 
 /*
  *  call-seq:
- *     a_range == obj    -> true or false
+ *     rng == obj    -> true or false
  *
  *  Returns true only if the other object is a Range, has the same
  *  #begin and #end values (by comparing them with <code>==</code>),
@@ -826,7 +826,7 @@ range_inspect(VALUE range)
 
 /*
  *  call-seq:
- *     a_range === obj       ->  true or false
+ *     rng === obj       ->  true or false
  *
  *  Returns true if the object is an element of this range. Otherwise,
  *  it returns false. Conveniently, <code>===</code> is the comparison
