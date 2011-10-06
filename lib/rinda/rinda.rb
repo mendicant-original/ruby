@@ -4,12 +4,11 @@ require 'thread'
 ##
 # == Overview
 #
-#
 # Rinda is a ruby implementation of the Linda distributed computing paradigm.
 #
 # Linda is a model of coordination and communication among several parallel
-# processes operating upon objects stored in and
-# retrieved from shared, virtual, associative memory.
+# processes operating upon objects stored in and retrieved from shared,
+# virtual, associative memory.
 #
 # In Rinda, distributed objects are stored in a TupleSpace in the form
 # of Tuples, ie:
@@ -33,7 +32,7 @@ require 'thread'
 #
 # Here is an example on how to build a distributed system using Rinda.
 #
-# The system is composed of three ruby applications
+# The system is composed of three ruby components:
 #
 # * client.rb
 # * server.rb
@@ -41,7 +40,7 @@ require 'thread'
 #
 # === tuple_space.rb
 #
-# It serves the TupleSpace that is going to be used by the two others.
+# Serves the TupleSpace used by the two other components.
 #
 #   require 'drb/drb'
 #   require 'rinda/tuplespace'
@@ -54,8 +53,7 @@ require 'thread'
 #
 # === client.rb
 #
-# It produces 10 tuples. Those tuples are manipulated in server.rb
-# Then it takes from TupleSpace 10 tuples and show the results.
+# Writes 10 tuples to the TupleSpace, then consumes and displays 10 tuples.
 #
 #   require 'drb/drb'
 #   require 'rinda/rinda'
@@ -76,9 +74,8 @@ require 'thread'
 #
 # === server.rb
 #
-# It consumes all tuples in the form ['sum', *, *]
-# and for each one that it consumes it produces a tuple
-# with the result of the manipulation.
+# Consumes tuples of the form ['sum', *, *] and writes a modified tuple 
+# back to the TupleSpace.
 #
 #   require 'drb/drb'
 #   require 'rinda/rinda'
@@ -216,17 +213,17 @@ module Rinda
   # as a wildcard, matching any value in the corresponding position in the
   # tuple.
   #
-  # Elements of the template match the +tuple+ if the are == or ===
+  # A template's elements will match the elements of the +tuple+ 
+  # if either == or === return true.
   #
-  #   Template.new([:foo, 5]).match   Tuple.new([:foo, 5]) # => true
-  #   Template.new([:foo, nil]).match Tuple.new([:foo, 5]) # => true
-  #   Template.new([String]).match    Tuple.new(['hello']) # => true
+  #   Template.new([:foo, 5]).match   Tuple.new([:foo, 5])  -> true
+  #   Template.new([:foo, nil]).match Tuple.new([:foo, 5])  -> true
+  #   Template.new([String]).match    Tuple.new(['hello'])  -> true
   #
-  #   Template.new([:foo]).match      Tuple.new([:foo, 5]) # => false
-  #   Template.new([:foo, 6]).match   Tuple.new([:foo, 5]) # => false
-  #   Template.new([:foo, nil]).match Tuple.new([:foo])    # => false
-  #   Template.new([:foo, 6]).match   Tuple.new([:foo])    # => false
-
+  #   Template.new([:foo]).match      Tuple.new([:foo, 5])  -> false
+  #   Template.new([:foo, 6]).match   Tuple.new([:foo, 5])  -> false
+  #   Template.new([:foo, nil]).match Tuple.new([:foo])     -> false
+  #   Template.new([:foo, 6]).match   Tuple.new([:foo])     -> false
 
   class Template < Tuple
 
