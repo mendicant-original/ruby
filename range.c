@@ -322,37 +322,15 @@ discrete_object_p(VALUE obj)
  *  Iterates over the range, passing each <i>n</i>th element to the
  *  block. It generates the elements by calling +succ+ on each
  *  element. (If the range contains numbers, it generates the elements
- *  by adding +n+ instead.)
- *
- *  If no block is given, an enumerator is returned instead.
+ *  by adding +n+.)
  *
  *  If +n+ is greater than the size of the range, it provides only the
  *  first item.
  *
- *     ('a'..'z').step(42) { |n| puts n }
+ *  If no block is given, it returns an enumerator.
  *
- *  <em>prints:</em>
- *
- *     a
- * 
- *  The following code uses class +Xs+, which is defined in the
- *  class-level documentation.
- *
- *     range = Xs.new(1)..Xs.new(10)
- *     range.step(2) {|x| puts x }
- *     range.step(3) {|x| puts x }
- *
- *  <em>produces:</em>
- *
- *      1 x
- *      3 xxx
- *      5 xxxxx
- *      7 xxxxxxx
- *      9 xxxxxxxxx
- *      1 x
- *      4 xxxx
- *      7 xxxxxxx
- *     10 xxxxxxxxxx
+ *     (1..5).step {|n| print "#{n} " }         #=> prints "1 2 3 4 5 "
+ *     ('a'..'z').step(6) {|c| print "#{c} " }  #=> prints "a g m s y "
  */
 
 
