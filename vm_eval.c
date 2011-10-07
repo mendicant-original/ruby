@@ -1429,8 +1429,7 @@ rb_mod_module_exec(int argc, VALUE *argv, VALUE mod)
  *  waiting for _tag_. Raises +ArgumentError+ if there
  *  is no +catch+ block for the _tag_. The optional second
  *  parameter supplies a return value for the +catch+ block,
- *  which otherwise defaults to +nil+. For examples, see
- *  <code>Kernel::catch</code>.
+ *  which otherwise defaults to +nil+. For examples, see Kernel#catch.
  */
 
 static VALUE

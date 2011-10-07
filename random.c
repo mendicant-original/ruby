@@ -765,10 +765,22 @@ random_load(VALUE obj, VALUE dump)
  *  <i>number</i>. If <i>number</i> is omitted,
  *  seeds the generator using a combination of the time, the
  *  process id, and a sequence number. (This is also the behavior if
- *  <code>Kernel::rand</code> is called without previously calling
+ *  <code>Kernel#rand</code> is called without previously calling
  *  <code>srand</code>, but without the sequence.) By setting the seed
- *  to a known value, scripts can be made deterministic during testing.
- *  The previous seed value is returned. Also see <code>Kernel::rand</code>.
+ *  to a known value, scripts can be made deterministic during testing, and
+ *  even in different applications sequence of generated randoms numbers 
+ *  are the same. The previous seed value is returned.
+ *  Also see Kernel#rand.
+ *
+ *      srand(2011)
+ *      rand(100)     #=> 43
+ *      rand(100)     #=> 77
+ *      rand(100)     #=> 40
+ *
+ *      srand(2011)   #=> 2011
+ *      rand(100)     #=> 43
+ *      rand(100)     #=> 77
+ *      rand(100)     #=> 40
  */
 
 static VALUE

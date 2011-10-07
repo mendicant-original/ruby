@@ -2763,6 +2763,23 @@ rb_fork(int *status, int (*chfunc)(void*), void *charg, VALUE fds)
  *  fork doesn't copy other threads.
  *
  *  If fork is not usable, Process.respond_to?(:fork) returns false.
+ *
+ *     fork do
+ *       3.times {|i| puts "Child: #{i}" }
+ *     end
+ *
+ *     3.times {|i| puts "Parent: #{i}" }
+ *
+ *     Process.wait
+ *
+ *  <em>produces:</em>
+ *
+ *     Parent: 0
+ *     Child: 0
+ *     Child: 1
+ *     Child: 2
+ *     Parent: 1
+ *     Parent: 2
  */
 
 static VALUE
