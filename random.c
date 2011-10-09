@@ -768,8 +768,8 @@ random_load(VALUE obj, VALUE dump)
  *  <code>Kernel#rand</code> is called without previously calling
  *  <code>srand</code>, but without the sequence.) By setting the seed
  *  to a known value, scripts can be made deterministic during testing, and
- *  even in different applications sequence of generated randoms numbers 
- *  are the same. The previous seed value is returned.
+ *  even different applications or systems will generate the same 
+ *  sequence of random numbers. The previous seed value is returned.
  *  Also see Kernel#rand.
  *
  *      srand(2011)

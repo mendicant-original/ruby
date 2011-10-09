@@ -359,7 +359,7 @@ rb_load_protect(VALUE fname, int wrap, int *state)
  *     load(filename, wrap=false)   -> true
  *
  *  Loads and executes the Ruby program in the file _filename_ 
- *  every time it's called. If the filename does not
+ *  every time it is called. If the filename does not
  *  resolve to an absolute path, the file is searched for in the library
  *  directories listed in <code>$:</code>. If the optional _wrap_
  *  parameter is +true+, the loaded script will be executed

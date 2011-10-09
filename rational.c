@@ -546,10 +546,10 @@ f_rational_new_no_reduce2(VALUE klass, VALUE x, VALUE y)
 
 /*
  * call-seq:
- *    Rational(x[, y])  ->  numeric
+ *    Rational(x[, y])  ->  rational
  *
- * Returns (x/y) as a <code>Rational</code>; Where x is numerator and
- * y is denominator.
+ * Returns <code>(x/y)</code> as a Rational with the numerator x and
+ * the denominator y.
  *
  *     Rational(1)      #=> (1/1)
  *     Rational(2, 3)   #=> (2/3)

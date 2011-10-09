@@ -2529,10 +2529,11 @@ rb_Array(VALUE val)
  *  Returns <i>arg</i> as an <code>Array</code>. First tries to call
  *  <i>arg</i><code>.to_ary</code>, then <i>arg</i><code>.to_a</code>.
  *
- *     Array(1..5)     #=> [1, 2, 3, 4, 5]
- *     Array([1, 2])   #=> [1, 2]
- *     Array(1)        #=> [1]
- *     Array(nil)      #=> []
+ *     Array(1..5)              #=> [1, 2, 3, 4, 5]
+ *     Array([1, 2])            #=> [1, 2]
+ *     Array(1)                 #=> [1]
+ *     Array({:foo => "bar"})   #=> [[:foo, "bar"]]
+ *     Array(nil)               #=> []
  */
 
 static VALUE
