@@ -485,7 +485,13 @@ rb_f_lambda(void)
  *   lambda { |...| block }  -> a_proc
  *
  * Equivalent to <code>Proc.new</code>, except the resulting Proc objects
- * check the number of parameters passed when called.
+ * check the number of parameters passed when called. The return statement 
+ * returns only from the proc itself.
+ *
+ *     sum = lambda { |a, b| a + b }
+ *
+ *     sum.call(2, 3)  #=> 5
+ *     sum.call(2)     # ArgumentError: wrong number of arguments (1 for 2)
  */
 
 static VALUE
