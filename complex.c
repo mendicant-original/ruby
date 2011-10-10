@@ -477,8 +477,8 @@ f_complex_new2(VALUE klass, VALUE x, VALUE y)
  * call-seq:
  *    Complex(x[, y])  ->  complex
  *
- * Returns <code>(x+i*y)</code> as a Complex;
- * Where x is the real part, y is the imaginary part and 
+ * Returns <code>(x+i*y)</code> as a Complex instance
+ * where x is the real part, y is the imaginary part and 
  * i is the imaginary unit.
  *
  *     Complex(1)           #=> (1+0i)
