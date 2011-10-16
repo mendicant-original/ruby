@@ -6132,8 +6132,8 @@ rb_io_putc(VALUE io, VALUE ch)
  *
  *    $stdout.putc(int)
  *
- * Refer to the documentation for IO#putc for important information regarding
- * multi-byte characters.
+ *  Refer to the documentation for IO#putc for important information regarding
+ *  multi-byte characters.
  */
 
 static VALUE
@@ -6239,6 +6239,9 @@ rb_io_puts(int argc, VALUE *argv, VALUE out)
  *  Equivalent to
  *
  *      $stdout.puts(obj, ...)
+ *
+ *  Refer to the documentation for IO#puts for important information regarding
+ *  how it prints _obj_ out.
  */
 
 static VALUE

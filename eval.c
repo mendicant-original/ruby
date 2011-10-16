@@ -492,7 +492,7 @@ static VALUE get_errinfo(void);
  *  array of callback information. Exceptions are caught by the
  *  +rescue+ clause of <code>begin...end</code> blocks.
  *
- *     raise "Failed to create socket"
+ *     raise "Failed to create socket"    # RuntimeError
  *     raise ArgumentError, "No parameters", caller
  */
 
@@ -1159,6 +1159,12 @@ errat_setter(VALUE val, ID id, VALUE *var)
  *  Returns the name of the current method as a Symbol.
  *  If called outside of a method, it returns <code>nil</code>.
  *
+ *     def my_method
+ *       __method__
+ *     end
+ *     
+ *     __method__   #=> nil
+ *     my_method    #=> :my_method
  */
 
 static VALUE

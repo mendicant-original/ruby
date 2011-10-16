@@ -358,14 +358,17 @@ rb_load_protect(VALUE fname, int wrap, int *state)
  *  call-seq:
  *     load(filename, wrap=false)   -> true
  *
- *  Loads and executes the Ruby
- *  program in the file _filename_. If the filename does not
+ *  Loads and executes the Ruby program in the file _filename_ 
+ *  every time it is called. If the filename does not
  *  resolve to an absolute path, the file is searched for in the library
  *  directories listed in <code>$:</code>. If the optional _wrap_
  *  parameter is +true+, the loaded script will be executed
  *  under an anonymous module, protecting the calling program's global
  *  namespace. In no circumstance will any local variables in the loaded
  *  file be propagated to the loading environment.
+ *
+ *     load 'patch.rb'
+ *     load 'lib/foo.rb'
  */
 
 static VALUE

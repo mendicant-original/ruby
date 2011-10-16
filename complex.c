@@ -475,9 +475,14 @@ f_complex_new2(VALUE klass, VALUE x, VALUE y)
 
 /*
  * call-seq:
- *    Complex(x[, y])  ->  numeric
+ *    Complex(x[, y])  ->  complex
  *
- * Returns x+i*y;
+ * Returns <code>(x+i*y)</code> as a Complex instance
+ * where x is the real part, y is the imaginary part and 
+ * i is the imaginary unit.
+ *
+ *     Complex(1)           #=> (1+0i)
+ *     Complex(2, 3)        #=> (2+3i)
  */
 static VALUE
 nucomp_f_complex(int argc, VALUE *argv, VALUE klass)
